@@ -17,12 +17,16 @@ class BaseIcalUrlDescription(models.TransientModel):
     name = fields.Char("Description", required=True)
 
     def _make_url(self):
-        if not self.user_has_groups("base.group_user"):
+        if not self.env.user.has_group("base.group_user"):
             raise AccessError(_("Only internal users can create API keys"))
 
         scope = f"odoo.plugin.ical.{self.calendar_id.id}"
 
-        token = self.env["res.users.apikeys"]._generate(scope, f"Calendar: {self.name}")
+        token = (
+            self.env["res.users.apikeys"]
+            .sudo()
+            ._generate(scope, f"Calendar: {self.name}", None)
+        )
 
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         return urlunparse(

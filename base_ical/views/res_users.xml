@@ -11,14 +11,14 @@
                 <page name="base_ical" string="Calendars">
                     <label for="ical_ids" string="Calendars" />
                     <field name="ical_ids">
-                        <tree>
+                        <list>
                             <button
                                 type="object"
                                 name="action_new_url"
                                 string="New URL"
                             />
                             <field name="name" />
-                        </tree>
+                        </list>
                     </field>
 
                     <label for="api_key_ids" string="Existing Access" />
@@ -28,7 +28,7 @@
                         nolabel="1"
                         readonly="1"
                     >
-                        <tree create="false">
+                        <list create="false">
                             <field name="name" />
                             <field name="scope" />
                             <field name="create_date" />
@@ -38,7 +38,7 @@
                                 icon="fa-trash"
                                 title="Delete"
                             />
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </notebook>

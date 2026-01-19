@@ -71,7 +71,7 @@ class BaseIcal(models.Model):
         "Allow automatically",
         copy=False,
         help="If you check this, the calendar will be enabled for all current and "
-        "future users. Not that unchecking this will not disable existing calendar "
+        "future users. Note that unchecking this will not disable existing calendar "
         "subscriptions",
     )
     help_text = fields.Html(compute="_compute_help")
@@ -114,9 +114,8 @@ class BaseIcal(models.Model):
             self.default_get(["domain", "expression_dtstamp", "expression_summary"])
         )
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-        self.expression_uid = "'%%s-%s@%s' %% record.id" % (
-            self.env.cr.dbname,
-            urlparse(base_url).hostname,
+        self.expression_uid = (
+            f"'%s-{self.env.cr.dbname}@{urlparse(base_url).hostname}' % record.id"
         )
 
     @api.constrains(
@@ -150,19 +149,25 @@ class BaseIcal(models.Model):
     def default_variables(self):
         self.ensure_one()
         variables = {
-            "datetime, relativedelta, time, timedelta": "useful Python libraries",
-            "record": "Record to export",
-            "user": "Current user record",
+            "datetime, relativedelta, time, timedelta": self.env._(
+                "useful Python libraries"
+            ),
+            "record": self.env._("Record to export"),
+            "user": self.env._("Current user record"),
         }
         if self.mode == "advanced":
             variables.update(
                 {
-                    "calendar": "Output: Calendar e.g. from `_get_ics_file`",
-                    "dict2ical": "Function to add the key-values of dict to ical component",
-                    "event": "Output: Dictionary of an VEVENT",
-                    "todo": "Output: Dictionary of an VTODO",
-                    "vobject": "vobject python library",
-                    "html2plaintext": "Converts HTML to plain text",
+                    "calendar": self.env._(
+                        "Output: Calendar e.g. from `_get_ics_file`"
+                    ),
+                    "dict2ical": self.env._(
+                        "Function to add the key-values of dict to ical component"
+                    ),
+                    "event": self.env._("Output: Dictionary of an VEVENT"),
+                    "todo": self.env._("Output: Dictionary of an VTODO"),
+                    "vobject": self.env._("vobject python library"),
+                    "html2plaintext": self.env._("Converts HTML to plain text"),
                 }
             )
         return variables

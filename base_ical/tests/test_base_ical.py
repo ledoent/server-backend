@@ -7,7 +7,8 @@ from urllib.parse import parse_qs, urlparse
 
 import vobject
 
-from odoo.tests.common import Form, TransactionCase
+from odoo.tests import Form
+from odoo.tests.common import TransactionCase
 
 _logger = logging.getLogger(__name__)
 
