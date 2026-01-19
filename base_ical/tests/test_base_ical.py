@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlparse
 
 import vobject
 
+from odoo import fields
 from odoo.tests import Form
 from odoo.tests.common import TransactionCase
 
@@ -123,4 +124,12 @@ class TestBaseIcal(TransactionCase):
 
         self.calendar.auto = True
         new_user = new_user.copy()
+        self.assertIn(new_user, self.calendar.allowed_users_ids)
+
+        new_group = self.env["res.groups"].create({"name": "New group"})
+        self.calendar.auto_group_ids = new_group
+        new_user = new_user.copy()
+        self.assertNotIn(new_user, self.calendar.allowed_users_ids)
+
+        new_user = new_user.copy({"groups_id": [fields.Command.link(new_group.id)]})
         self.assertIn(new_user, self.calendar.allowed_users_ids)

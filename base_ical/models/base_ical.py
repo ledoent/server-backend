@@ -74,6 +74,14 @@ class BaseIcal(models.Model):
         "future users. Note that unchecking this will not disable existing calendar "
         "subscriptions",
     )
+    auto_group_ids = fields.Many2many(
+        "res.groups",
+        relation="base_ical_auto_groups_rel",
+        string="Groups",
+        help="Only users of selected groups will be auto-allowed. "
+        "Leave empty for all users",
+        default=lambda self: self.env.ref("base.group_user"),
+    )
     help_text = fields.Html(compute="_compute_help")
 
     def _valid_field_parameter(self, field, name):
@@ -142,7 +150,7 @@ class BaseIcal(models.Model):
     def write(self, vals):
         """Enable calendar for all users if auto flag is checked"""
         result = super().write(vals)
-        if vals.get("auto"):
+        if vals.get("auto") or vals.get("auto_group_ids"):
             self._enable_all_users()
         return result
 
@@ -295,8 +303,11 @@ class BaseIcal(models.Model):
 
     def _enable_all_users(self, users=None):
         """Enable calendar for all users"""
-        users = users or self.env.ref("base.group_user").users
-        self.write({"allowed_users_ids": users})
+        for this in self:
+            users = (
+                users or this.auto_group_ids.users or self.env["res.users"].search([])
+            )
+            this.write({"allowed_users_ids": users})
 
     def action_new_url(self):
         """Create or activate current user's token"""

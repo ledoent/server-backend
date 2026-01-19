@@ -22,6 +22,23 @@ class ResUsers(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         result = super().create(vals_list)
-        calendars = self.env["base.ical"].search([("auto", "=", True)])
-        calendars.sudo().write({"allowed_users_ids": [(4, result.id)]})
+        auto_calendars = (
+            self.env["base.ical"]
+            .sudo()
+            .search(
+                [
+                    ("auto", "=", True),
+                    "|",
+                    ("auto_group_ids", "=", False),
+                    ("auto_group_ids", "in", result.groups_id.ids),
+                ]
+            )
+        )
+        if not auto_calendars:
+            return result
+        for this in result:
+            auto_calendars.filtered(
+                lambda x, this=this: not x.auto_group_ids
+                or this.groups_id & x.auto_group_ids
+            ).write({"allowed_users_ids": [fields.Command.link(this.id)]})
         return result
