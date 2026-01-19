@@ -11,7 +11,11 @@
                     <p>
                         Here is your new URL to the calendar.
                     </p>
-                    <p><code><field name="url" readonly="True" /></code></p>
+                    <p>
+                        <code>
+                            <field name="url" readonly="True" />
+                        </code>
+                    </p>
                     <p class="alert alert-warning" role="alert">
                         <strong>Important:</strong>
                         The url cannot be retrieved later and provides access to this calendar without further authentication.
@@ -60,7 +64,9 @@
             <form>
                 <sheet>
                     <label class="oe_edit_only" for="name" />
-                    <h1><field name="name" /></h1>
+                    <h1>
+                        <field name="name" />
+                    </h1>
                     <group>
                         <group name="main">
                             <field name="mode" />
@@ -78,7 +84,6 @@
                             string="Simple Configuration"
                             attrs="{'invisible': [('mode', '!=', 'simple')]}"
                         >
-
                             <field
                                 name="expression_dtstamp"
                                 attrs="{'required': [('mode', '=', 'simple')]}"
@@ -139,9 +144,9 @@
 
     <record id="action_base_ical" model="ir.actions.act_window">
         <field name="name">iCalendars</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">base.ical</field>
-            <field name="view_mode">tree,form</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">base.ical</field>
+        <field name="view_mode">tree,form</field>
     </record>
 
     <menuitem id="menu_ical" parent="base.menu_custom" action="action_base_ical" />
