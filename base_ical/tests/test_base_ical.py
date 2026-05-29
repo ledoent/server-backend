@@ -18,8 +18,18 @@ class TestBaseIcal(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.calendar = cls.env.ref("base_ical.demo_calendar")
-        cls.user = cls.env.ref("base.user_demo")
+        # Build a self-contained fixture instead of relying on demo data,
+        # which OCA CI does not load (env.ref on a demo xmlid would fail).
+        cls.calendar = cls.env["base.ical"].create(
+            {
+                "name": "Demo calendar",
+                "model_id": cls.env.ref("base.model_res_users").id,
+                "expression_uid": "str(record.id)",
+                "expression_dtstart": "record.create_date",
+                "expression_dtend": "record.write_date",
+            }
+        )
+        cls.user = cls.env.ref("base.user_admin")
 
     def test_profile(self):
         """Test url generation"""
@@ -131,5 +141,5 @@ class TestBaseIcal(TransactionCase):
         new_user = new_user.copy()
         self.assertNotIn(new_user, self.calendar.allowed_users_ids)
 
-        new_user = new_user.copy({"groups_id": [fields.Command.link(new_group.id)]})
+        new_user = new_user.copy({"group_ids": [fields.Command.link(new_group.id)]})
         self.assertIn(new_user, self.calendar.allowed_users_ids)

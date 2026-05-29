@@ -9,8 +9,18 @@ class TestBaseIcalHttp(HttpCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.calendar = cls.env.ref("base_ical.demo_calendar")
-        cls.user = cls.env.ref("base.user_demo")
+        # Build a self-contained fixture instead of relying on demo data,
+        # which OCA CI does not load (env.ref on a demo xmlid would fail).
+        cls.calendar = cls.env["base.ical"].create(
+            {
+                "name": "Demo calendar",
+                "model_id": cls.env.ref("base.model_res_users").id,
+                "expression_uid": "str(record.id)",
+                "expression_dtstart": "record.create_date",
+                "expression_dtend": "record.write_date",
+            }
+        )
+        cls.user = cls.env.ref("base.user_admin")
         desc = (
             cls.env["base.ical.url.description"]
             .with_user(cls.user)

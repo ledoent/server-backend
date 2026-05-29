@@ -3,7 +3,7 @@
 
 from urllib.parse import urlparse, urlunparse
 
-from odoo import _, fields, models
+from odoo import fields, models
 from odoo.exceptions import AccessError
 
 from odoo.addons.base.models.res_users import check_identity
@@ -18,7 +18,7 @@ class BaseIcalUrlDescription(models.TransientModel):
 
     def _make_url(self):
         if not self.env.user.has_group("base.group_user"):
-            raise AccessError(_("Only internal users can create API keys"))
+            raise AccessError(self.env._("Only internal users can create API keys"))
 
         scope = f"odoo.plugin.ical.{self.calendar_id.id}"
 

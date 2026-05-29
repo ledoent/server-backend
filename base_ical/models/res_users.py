@@ -30,7 +30,7 @@ class ResUsers(models.Model):
                     ("auto", "=", True),
                     "|",
                     ("auto_group_ids", "=", False),
-                    ("auto_group_ids", "in", result.groups_id.ids),
+                    ("auto_group_ids", "in", result.all_group_ids.ids),
                 ]
             )
         )
@@ -39,6 +39,6 @@ class ResUsers(models.Model):
         for this in result:
             auto_calendars.filtered(
                 lambda x, this=this: not x.auto_group_ids
-                or this.groups_id & x.auto_group_ids
+                or this.all_group_ids & x.auto_group_ids
             ).write({"allowed_users_ids": [fields.Command.link(this.id)]})
         return result

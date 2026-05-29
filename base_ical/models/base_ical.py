@@ -10,7 +10,7 @@ import pytz
 import vobject
 from dateutil import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.tools import html2plaintext
 from odoo.tools.safe_eval import safe_eval, wrap_module
 
@@ -25,8 +25,8 @@ class BaseIcal(models.Model):
 
     def _get_operating_modes(self):
         return [
-            ("simple", _("Simple")),
-            ("advanced", _("Advanced")),
+            ("simple", self.env._("Simple")),
+            ("advanced", self.env._("Advanced")),
         ]
 
     active = fields.Boolean(default=True)
@@ -259,7 +259,7 @@ class BaseIcal(models.Model):
             context.update(
                 {"record": record, "calendar": None, "event": None, "todo": None}
             )
-            safe_eval(self.code, context, mode="exec", nocopy=True)
+            safe_eval(self.code, context, mode="exec")
 
             cal = context.get("calendar")
             if cal:
@@ -305,7 +305,9 @@ class BaseIcal(models.Model):
         """Enable calendar for all users"""
         for this in self:
             users = (
-                users or this.auto_group_ids.users or self.env["res.users"].search([])
+                users
+                or this.auto_group_ids.user_ids
+                or self.env["res.users"].search([])  # pylint: disable=no-search-all
             )
             this.write({"allowed_users_ids": users})
 
