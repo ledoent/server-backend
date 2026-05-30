@@ -39,7 +39,9 @@ class ResUsersEffectivePermission(models.TransientModel):
                 allowed_company_ids=user.company_id.ids,
             )
         )
-        for model_record in self.env["ir.model"].search([]):
+        # Intentionally scan every model to report per-model access.
+        ir_models = self.env["ir.model"].search([])  # pylint: disable=no-search-all
+        for model_record in ir_models:
             if model_record.model not in self.env:
                 continue
             model = (
