@@ -12,11 +12,28 @@ class TestModule(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.action_server = cls.env.ref(
-            "server_action_navigate.navigate_partner_2_tags"
+        # Demo data is not loaded on OCA CI (--without-demo=all); recreate the
+        # demo server action + navigate lines inline.
+        cls.action_server = cls.env["ir.actions.server"].create(
+            {
+                "name": "See Tags of Partners of Users",
+                "state": "navigate",
+                "model_id": cls.env.ref("base.model_res_users").id,
+            }
         )
-        cls.navigate_line_1 = cls.env.ref("server_action_navigate.navigate_line_1")
-        cls.navigate_line_2 = cls.env.ref("server_action_navigate.navigate_line_2")
+        cls.navigate_line_1 = cls.env["ir.actions.server.navigate.line"].create(
+            {
+                "action_id": cls.action_server.id,
+                "field_id": cls.env.ref("base.field_res_users__partner_id").id,
+            }
+        )
+        cls.navigate_line_2 = cls.env["ir.actions.server.navigate.line"].create(
+            {
+                "action_id": cls.action_server.id,
+                "field_id": cls.env.ref("base.field_res_partner__category_id").id,
+            }
+        )
+        cls.action_server.create_action()
         cls.users = cls.env["res.users"].search([])
 
     def test_action_result(self):
