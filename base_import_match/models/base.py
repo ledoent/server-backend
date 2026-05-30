@@ -28,9 +28,11 @@ class Base(models.AbstractModel):
                     values[column] = self.browse(dbid).get_external_id().get(dbid)
             # Data conversion to ORM format
             import_fields = list(map(models.fix_import_export_id_paths, fields))
-            converted_data = self._convert_records(
-                self._extract_records(import_fields, data)
-            )
+            with self.env.cr.savepoint() as savepoint:
+                converted_data = self._convert_records(
+                    self._extract_records(import_fields, data),
+                    savepoint=savepoint,
+                )
             # Mock Odoo to believe the user is importing the ID field
             if "id" not in fields:
                 fields.append("id")
